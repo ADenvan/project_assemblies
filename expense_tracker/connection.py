@@ -4,17 +4,20 @@ from PySide6 import QtWidgets, QtSql
 class Data:
     def __init__(self):
         super(Data, self).__init__()
-        self.create_connection()
+        self.create_connection() # Инициализация подключения
 
     def create_connection(self):
-        db = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-        db.setDatabaseName('expense_db.db')
+        """SQLite: Используется встроенная БД. Автоматическое создание таблицы при первом запуске."""
+        db = QtSql.QSqlDatabase.addDatabase('QSQLITE') # Драйвер SQLite
+        db.setDatabaseName('.\expense_tracker\expense_db.db')
 
         if not db.open():
+            # Обработка ошибки подключения
             QtWidgets.QMessageBox.critical(None, "Cannot open database",
                                            "Click Cancel to exit.", QtWidgets.QMessageBox.Cancel)
             return False
 
+        # Создание таблицы, если не существует
         query = QtSql.QSqlQuery()
         query.exec("CREATE TABLE IF NOT EXISTS expenses (ID integer primary key AUTOINCREMENT, Date VARCHAR(20), "
                    "Category VARCHAR(20), Description VARCHAR(20), Balance REAL, Status VARCHAR(20))")
@@ -32,6 +35,7 @@ class Data:
 
         return query
 
+    # Параметризованные запросы: Использование ? для защиты от SQL-инъекций.
     def add_new_transaction_query(self, date, category, description, balance, status):
         sql_query = "INSERT INTO expenses (Date, Category, Description, Balance, Status) VALUES (?, ?, ?, ?, ?)"
         self.execute_query_with_params(sql_query, [date, category, description, balance, status])
@@ -45,6 +49,7 @@ class Data:
         self.execute_query_with_params(sql_query, [id])
 
     def get_total(self, column, filter=None, value=None):
+        """Динамическое формирование запроса: Для подсчета сумм по категориям. Возвращает строку с символом $ (может вызвать ошибку, если значение NULL)."""
         sql_query = f"SELECT SUM({column}) FROM expenses"
 
         if filter is not None and value is not None:

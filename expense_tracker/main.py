@@ -7,7 +7,14 @@ from PySide6.QtSql import QSqlTableModel
 from ui_main import Ui_MainWindow
 from new_transaction import Ui_Dialog
 from connection import Data
-
+"""Импорт системных модулей (sys) для работы с аргументами командной строки.
+PySide6 модули для GUI и работы с БД:
+QtWidgets - базовые виджеты.
+QApplication - главный класс приложения.
+QMainWindow - окно главного интерфейса.
+QSqlTableModel - модель для отображения табличных данных из БД.
+Пользовательские UI-классы (Ui_MainWindow, Ui_Dialog), сгенерированные Qt Designer.
+"""
 
 class ExpenseTracker(QMainWindow):
     def __init__(self):
@@ -42,6 +49,7 @@ class ExpenseTracker(QMainWindow):
         self.ui.tableView.setModel(self.model)  # Связь с виджетом
 
     def open_new_transaction_window(self):
+        """Динамическое окно: Создается при каждом вызове. Определение отправителя: Проверка текста кнопки для выбора действия."""
         self.new_window = QtWidgets.QDialog()     # Создание диалога
         self.ui_window = Ui_Dialog()              # Инициализация UI
         self.ui_window.setupUi(self.new_window)   # Настройка виджетов
@@ -55,37 +63,44 @@ class ExpenseTracker(QMainWindow):
             self.ui_window.btn_new_transaction.clicked.connect(self.edit_current_transaction)
 
     def add_new_transaction(self):
+        """Сбор данных: Из виджетов диалогового окна. Метод add_new_transaction_query() выполняет SQL-запрос INSERT."""
+        # Получение данных из полей ввода
         date = self.ui_window.dateEdit.text()
         category = self.ui_window.cb_choose_category.currentText()
         description = self.ui_window.le_description.text()
         balance = self.ui_window.le_balance.text()
         status = self.ui_window.cb_status.currentText()
 
+        # Вызов метода добавления в БД
         self.conn.add_new_transaction_query(date, category, description, balance, status)
-        self.view_data()
-        self.reload_data()
-        self.new_window.close()
+        self.view_data()       # Обновление таблицы
+        self.reload_data()     # Обновление статистики
+        self.new_window.close()  # Закрытие окна
 
     def edit_current_transaction(self):
-        index = self.ui.tableView.selectedIndexes()[0]
-        id = str(self.ui.tableView.model().data(index))
+        """Получение ID: Из выделенной строки таблицы. Метод update_transaction_query() выполняет SQL-запрос UPDATE."""
+        index = self.ui.tableView.selectedIndexes()[0] # Выбранная строка
+        id = str(self.ui.tableView.model().data(index)) # ID записи
 
+        # Получение новых данных
         date = self.ui_window.dateEdit.text()
         category = self.ui_window.cb_choose_category.currentText()
         description = self.ui_window.le_description.text()
         balance = self.ui_window.le_balance.text()
         status = self.ui_window.cb_status.currentText()
-
+        
+        # Вызов метода обновления в БД
         self.conn.update_transaction_query(date, category, description, balance, status, id)
         self.view_data()
         self.reload_data()
         self.new_window.close()
 
     def delete_current_transaction(self):
-        index = self.ui.tableView.selectedIndexes()[0]
-        id = str(self.ui.tableView.model().data(index))
+        """Метод delete_transaction_query() выполняет SQL-запрос DELETE."""
+        index = self.ui.tableView.selectedIndexes()[0]  # Выбранная строка
+        id = str(self.ui.tableView.model().data(index)) # ID записи
 
-        self.conn.delete_transaction_query(id)
+        self.conn.delete_transaction_query(id)  # Удаление записи
         self.view_data()
         self.reload_data()
 
