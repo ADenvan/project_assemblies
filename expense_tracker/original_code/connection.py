@@ -9,7 +9,7 @@ class Data:
     def create_connection(self):
         """SQLite: Используется встроенная БД. Автоматическое создание таблицы при первом запуске."""
         db = QtSql.QSqlDatabase.addDatabase('QSQLITE') # Драйвер SQLite
-        db.setDatabaseName('.\expense_tracker\expense_db.db')
+        db.setDatabaseName('.\expense_db.db')
 
         if not db.open():
             # Обработка ошибки подключения

@@ -21,7 +21,7 @@ class ExpenseTracker(QMainWindow):
         super(ExpenseTracker, self).__init__()
         self.ui = Ui_MainWindow()  # Инициализация интерфейса
         self.ui.setupUi(self)      # Настройка виджетов
-        self.conn = Data()        # Подключение к БД
+        self.conn = Data()        # Подключение к Б
         self.view_data()           # Загрузка данных в таблицу
         self.reload_data()         # Обновление статистики
 

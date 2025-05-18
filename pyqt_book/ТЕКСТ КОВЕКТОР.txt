@@ -1,0 +1,8 @@
+pyside6-rcc res-rc.qrc -o res_rc.py
+pyside6-rcc res-new-window-rc.qrc -o res_new_window_rc.py
+
+pyside6-uic ui_main.ui -o ui_main.py
+pyside6-uic new_transaction.ui -o new_transaction.py
+
+
+
